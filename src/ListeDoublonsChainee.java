@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.*;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -7,18 +8,20 @@ import java.util.ArrayList;
  * and open the template in the editor.
  */
 /**
+ * PAQL20099109
  *
  * @author Laurier
+ * @param <T>
  */
-public class ListeDoublonsChainee implements ListeDoublons<Object> {
+public class ListeDoublonsChainee<T> implements ListeDoublons<T> {
 
-    MaillonD debut = null; //maillon de début de la liste 
-    MaillonD fin = null; //maillon de la fin de la liste 
+    MaillonD<T> debut = null; //maillon de début de la liste 
+    MaillonD<T> fin = null; //maillon de la fin de la liste
 
     //pointe sur le premier des doublons en fin de liste 
     int nbrElements = 0; //nombre d’éléments distincts dans la liste 
 
-    public ListeDoublonsChainee() {
+    ListeDoublonsChainee() {
     }
 
     @Override
@@ -34,37 +37,45 @@ public class ListeDoublonsChainee implements ListeDoublons<Object> {
     @Override
     public void ajouter(Object element) {
 
-        MaillonD temp = debut;
-        MaillonD temp2 = new MaillonD(element);
+        MaillonD<T> temp = debut;
+        MaillonD<T> temp2 = new MaillonD(element);
         if (element != null) {
-            while (!(element.equals(temp.getInfo())) && temp != null) {
+            while (temp != null && !element.equals(temp.getInfo())) {
                 temp = temp.getSuivant();
             }
-            if (element.equals(temp.getInfo())) {
+            if (temp != null && element.equals(temp.getInfo())) {
                 while (temp.getDoublonSuivant() != null) {
                     temp = temp.getDoublonSuivant();
                 }
                 temp.setDoublonSuivant(temp2);
             } else {
-                fin.setSuivant(temp2);
-                fin = temp2;
-                nbrElements++;
+                if (debut == null) {
+                    debut = temp2;
+                    fin = temp2;
+                    nbrElements++;
+                } else {
+                    fin.setSuivant(temp2);
+                    fin = temp2;
+                    nbrElements++;
+                }
             }
+        } else {
+            throw new NullPointerException();
         }
     }
 
     @Override
-    public ArrayList<Object> obtenirDoublons(Object element) {
+    public ArrayList<T> obtenirDoublons(Object element) {
 
-        ArrayList<Object> listeRetour = new ArrayList<>();
-        MaillonD temp = debut;
+        ArrayList<T> listeRetour = new ArrayList<>();
+        MaillonD<T> temp = debut;
 
         if (element != null) {
-            while (!element.equals(temp.getInfo()) && temp != null) {
+            while (temp != null && !element.equals(temp.getInfo())) {
                 temp = temp.getSuivant();
             }
             while (temp != null) {
-                listeRetour.add(temp);
+                listeRetour.add((T) temp.getInfo());
                 temp = temp.getDoublonSuivant();
             }
         }
@@ -72,13 +83,13 @@ public class ListeDoublonsChainee implements ListeDoublons<Object> {
     }
 
     @Override
-    public ArrayList<Object> obtenirElementsDistincts() {
+    public ArrayList<T> obtenirElementsDistincts() {
 
-        ArrayList<Object> listeRetour = new ArrayList<>();
-        MaillonD temp = debut;
+        ArrayList<T> listeRetour = new ArrayList<>();
+        MaillonD<T> temp = debut;
 
         while (temp != null) {
-            listeRetour.add(temp);
+            listeRetour.add((T) temp.getInfo());
             temp = temp.getSuivant();
         }
         return listeRetour;
@@ -90,18 +101,19 @@ public class ListeDoublonsChainee implements ListeDoublons<Object> {
         MaillonD temp = debut;
         MaillonD temp2;
         if (element != null) {
-            while (!element.equals(temp.getSuivant().getInfo()) && temp != null) {
+            while (temp.getSuivant() != null && !element.equals(temp.getSuivant().getInfo())) {
+
+                if (temp != null) {
+                    temp2 = temp;
+                    temp = temp.getSuivant();
+                    temp2.setSuivant(temp.getSuivant());
+                    retour = true;
+                }
+                //regarde si le suivant du nouveau pointeur est null ou non
+                if (temp.getSuivant().getSuivant() != null) {
+                    fin = temp.getSuivant();
+                }
                 temp = temp.getSuivant();
-            }
-            if (temp != null) {
-                temp2 = temp;
-                temp = temp.getSuivant();
-                temp2.setSuivant(temp.getSuivant());
-                retour = true;
-            }
-            //regarde si le suivant du nouveau pointeur est null ou non
-            if (temp.getSuivant().getSuivant() == null) {
-                fin = temp.getSuivant();
             }
         }
         setNbrEement();
@@ -114,7 +126,7 @@ public class ListeDoublonsChainee implements ListeDoublons<Object> {
         MaillonD temp = debut;
 
         if (element != null) {
-            while (!element.equals(temp.getInfo()) && temp != null) {
+            while (temp != null && !element.equals(temp.getInfo())) {
                 temp = temp.getSuivant();
             }
             while (temp != null) {
@@ -129,11 +141,12 @@ public class ListeDoublonsChainee implements ListeDoublons<Object> {
     public boolean existe(Object element) {
         boolean existe = false;
         MaillonD temp = debut;
-
-        while (!element.equals(temp.getInfo()) && temp != null) {
-            temp = temp.getSuivant();
-            if (temp.getInfo().equals(element)) {
-                existe = true;
+        if (element != null) {
+            while (temp != null && !existe) {
+                if (element.equals(temp.getInfo())) {
+                    existe = true;
+                }
+                temp = temp.getSuivant();
             }
         }
         return existe;
@@ -147,13 +160,19 @@ public class ListeDoublonsChainee implements ListeDoublons<Object> {
     }
 
     @Override
-    public Object premier() {
-        return debut;
+    public T premier() {
+        if (nbrElements == 0) {
+            throw new NoSuchElementException();
+        }
+        return (T) debut.getInfo();
     }
 
     @Override
-    public Object dernier() {
-        return fin;
+    public T dernier() {
+        if (nbrElements == 0) {
+            throw new NoSuchElementException();
+        }
+        return (T) fin.getInfo();
     }
 
     private void setNbrEement() {
@@ -178,7 +197,7 @@ public class ListeDoublonsChainee implements ListeDoublons<Object> {
             p = debut;
             while (p != null) {
                 s = s + p.getInfo();
-                if (p.getDoublonSuivant() != null|| p.getSuivant() != null) {
+                if (p.getDoublonSuivant() != null || p.getSuivant() != null) {
                     s = s + ", ";
                 }
                 p2 = p;
