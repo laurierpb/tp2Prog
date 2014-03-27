@@ -105,20 +105,22 @@ public class ListeDoublonsChainee<T> implements ListeDoublons<T> {
                 temp2 = temp;
                 temp = temp.getSuivant();
             }
-            if(temp == debut && temp == fin){
-                debut = null;
-                fin = null;
-                retour = true;
-            }else if(temp == fin){
-                temp2.setSuivant(null);
-                fin = temp2;
-                retour = true;
-            }else if(temp == debut){
-                debut = temp.getSuivant();
-                retour = true;
-            }else if(temp != null){
-                temp2.setSuivant(temp.getSuivant());
-                retour = true;
+            if (temp != null) {
+                if (temp == debut && temp == fin) {
+                    debut = null;
+                    fin = null;
+                    retour = true;
+                } else if (temp == fin) {
+                    temp2.setSuivant(null);
+                    fin = temp2;
+                    retour = true;
+                } else if (temp == debut) {
+                    debut = temp.getSuivant();
+                    retour = true;
+                } else if (temp != null) {
+                    temp2.setSuivant(temp.getSuivant());
+                    retour = true;
+                }
             }
         }
         setNbrEement();
