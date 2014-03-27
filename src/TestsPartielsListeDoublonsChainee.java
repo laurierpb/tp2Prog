@@ -169,8 +169,7 @@ public class TestsPartielsListeDoublonsChainee {
       System.out.println(b + " (false)");
       System.out.println(liste.longueur() + " (4)");
       System.out.println();
-      
-      b = liste.supprimerTous(p10);
+      System.out.println(p10.getNom());
       System.out.println("Liste obtenue  : " + liste);
       System.out.println("Liste attendue : Bob:777-2345, Bob:222-2222, "
               + "Julie:223-0098, Julie:348-2907, Julie:348-2907, Ali:276-0328, "

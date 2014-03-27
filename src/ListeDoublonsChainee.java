@@ -99,21 +99,26 @@ public class ListeDoublonsChainee<T> implements ListeDoublons<T> {
     public boolean supprimerTous(Object element) {
         boolean retour = false;
         MaillonD temp = debut;
-        MaillonD temp2;
+        MaillonD temp2 = temp;
         if (element != null) {
-            while (temp.getSuivant() != null && !element.equals(temp.getSuivant().getInfo())) {
-
-                if (temp != null) {
-                    temp2 = temp;
-                    temp = temp.getSuivant();
-                    temp2.setSuivant(temp.getSuivant());
-                    retour = true;
-                }
-                //regarde si le suivant du nouveau pointeur est null ou non
-                if (temp.getSuivant().getSuivant() != null) {
-                    fin = temp.getSuivant();
-                }
+            while (temp != null && !element.equals(temp.getInfo())) {
+                temp2 = temp;
                 temp = temp.getSuivant();
+            }
+            if(temp == debut && temp == fin){
+                debut = null;
+                fin = null;
+                retour = true;
+            }else if(temp == fin){
+                temp2.setSuivant(null);
+                fin = temp2;
+                retour = true;
+            }else if(temp == debut){
+                debut = temp.getSuivant();
+                retour = true;
+            }else if(temp != null){
+                temp2.setSuivant(temp.getSuivant());
+                retour = true;
             }
         }
         setNbrEement();
